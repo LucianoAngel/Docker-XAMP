@@ -1,7 +1,8 @@
 version: "3"
 services:
   mysql:
-    image: mysql:8
+    image: arm64v8/mysql:8
+    platform: linux/arm64/v8
     restart: always
     container_name: mysql8
     environment:
@@ -16,9 +17,11 @@ services:
       bridge:
         aliases:
           - mysql
+
   phpmyadmin:
     container_name: phpmyadmin
-    image: phpmyadmin/phpmyadmin
+    image: arm64v8/phpmyadmin
+    platform: linux/arm64/v8
     restart: always
     environment:
       - PMA_HOST=mysql
@@ -36,11 +39,14 @@ services:
       bridge:
         aliases:
           - phpmyadmin
+
   apache-php:
     container_name: apache-php8
     build:
       context: .
       dockerfile: ./apache-php/Dockerfile
+      platforms:
+        - linux/arm64/v8
     restart: always
     expose:
       - 80
@@ -54,6 +60,7 @@ services:
       bridge:
         aliases:
           - apache
+
 volumes:
   mysql:
     driver: local
