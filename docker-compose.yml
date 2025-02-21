@@ -1,0 +1,63 @@
+version: "3"
+services:
+  mysql:
+    image: mysql:8
+    restart: always
+    container_name: mysql8
+    environment:
+      - MYSQL_ROOT_PASSWORD=toor
+    expose:
+      - 3306
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql:/var/lib/mysql/
+    networks:
+      bridge:
+        aliases:
+          - mysql
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=mysql
+      - UPLOAD_LIMIT=500000000
+      - PMA_USER=root
+      - PMA_PASSWORD=toor
+    expose:
+      - 80
+    ports:
+      - 8080:80
+    depends_on:
+      - mysql
+      - apache-php
+    networks:
+      bridge:
+        aliases:
+          - phpmyadmin
+  apache-php:
+    container_name: apache-php8
+    build:
+      context: .
+      dockerfile: ./apache-php/Dockerfile
+    restart: always
+    expose:
+      - 80
+    ports:
+      - 80:80
+    volumes:
+      - apache-php:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      bridge:
+        aliases:
+          - apache
+volumes:
+  mysql:
+    driver: local
+  apache-php:
+    driver: local
+networks:
+  bridge:
